@@ -343,11 +343,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b73e093c826b645c088ad1897a4f03f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fileBrowserPrefab: {fileID: 1760643962491650, guid: 4599b5ba3543545db92bb18160cea721,
+  FileBrowserPrefab: {fileID: 1760643962491650, guid: 4599b5ba3543545db92bb18160cea721,
     type: 2}
-  textToSave: 
-  saving: 0
-  fileExtension: txt
+  FileExtension: txt
 --- !u!4 &201018194
 Transform:
   m_ObjectHideFlags: 0
