@@ -51,14 +51,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b490ae6d011147dda31f19060ceae18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HideIncompatibleFileExtensions: 0
-  FileBrowserScale: 1
-  fileBrowserUiPrefab: {fileID: 1183516625028436, guid: e246cc6e9fd91465a9045cee33e07e0a,
+  FileBrowserUiPrefab: {fileID: 1183516625028436, guid: e246cc6e9fd91465a9045cee33e07e0a,
     type: 2}
-  timeBetweenClicks: 0.5
   DirectoryButtonPrefab: {fileID: 1781446219088990, guid: c50a28e362f5046f1b365259e51af4c5,
     type: 2}
   FileButtonPrefab: {fileID: 1781446219088990, guid: c8143dc148b024025a875a3c83a9d60f,
     type: 2}
-  saveImage: {fileID: 21300000, guid: 246e1a8e6ee9147b595267a05a5e8d73, type: 3}
-  loadImage: {fileID: 21300000, guid: bcac61915feda41c2840db8963b97615, type: 3}
+  SaveImage: {fileID: 21300000, guid: 246e1a8e6ee9147b595267a05a5e8d73, type: 3}
+  LoadImage: {fileID: 21300000, guid: bcac61915feda41c2840db8963b97615, type: 3}
+  HideIncompatibleFiles: 0
+  FileBrowserScale: 1

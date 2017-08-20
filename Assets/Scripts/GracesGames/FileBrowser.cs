@@ -17,7 +17,7 @@ namespace GracesGames {
 		
 		// ----- PUBLIC UI ELEMENTS -----
 		
-		// The parent object of the File Browser UI as prefab
+		// The File Browser UI as prefab
 		public GameObject FileBrowserUiPrefab;
 		
 		// Button Prefab used to create a button for each directory in the current path
@@ -34,7 +34,7 @@ namespace GracesGames {
 		
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
-		// Wheter files with incompatible extensions should be hidden
+		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
 		
 		// Dimension used to set the scale of the UI
@@ -45,9 +45,6 @@ namespace GracesGames {
 		// Input field and variable to allow file search
 		private InputField _searchInputField;
 		private string _searchFilter = "";
-		
-		// Allow 2 clicks per second for the directory up button
-		public float WaitTimeBetweenClicks = 0.5f;
 		
 		// ----- PRIVATE UI ELEMENTS ------
 
@@ -76,7 +73,7 @@ namespace GracesGames {
 		private FileBrowserMode _mode;
 		
 		// MonoBehaviour script used to call this script
-		// Saved for the call back or cancellation
+		// Saved for the call back with the (empty) result
 		private MonoBehaviour _callerScript;
 
 		// Method to be called of the callerScript when selecting a file or closing the file browser
@@ -92,12 +89,9 @@ namespace GracesGames {
 		// The name for file to be saved
 		private string _saveFileName;
 
-		// Stacks to keep track for backward and forward feature
+		// Stacks to keep track for backward and forward navigation feature
 		private readonly FiniteStack<string> _backwardStack = new FiniteStack<string> ();
 		private readonly FiniteStack<string> _forwardStack = new FiniteStack<string> ();
-
-		// Variable to keep time for the clicks per second
-		private float _timestamp;
 
 		// String file extension to filter results and save new files
 		private string _fileExtension;
@@ -109,7 +103,7 @@ namespace GracesGames {
 			SetupFileBrowser();
 		}
 
-		// Finds and returns a game object by name or prints and error and increments error counter
+		// Finds and returns a game object by name or prints an error and return null
 		private GameObject FindGameObjectOrError(string objectName) {
 			GameObject foundGameObject = GameObject.Find(objectName);
 			if (foundGameObject == null) {
@@ -120,6 +114,8 @@ namespace GracesGames {
 			}
 		}
 
+		// Tries to find a button by name and add a on click listener action to it
+		// Returns the resulting button 
 		private GameObject FindButtonAndAddOnClickListener(string buttonName, UnityAction listenerAction) {
 			GameObject button = FindGameObjectOrError(buttonName);
 			button.GetComponent<Button>().onClick.AddListener(listenerAction);
@@ -133,7 +129,8 @@ namespace GracesGames {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
-			// Instantiate the file browser UI using the transform of the canvas and name + scale it
+			// Instantiate the file browser UI using the transform of the canvas
+			// After creation, name it and scale it
 			if (uiCanvas != null) {
 				GameObject fileBrowserUiInstance = Instantiate(FileBrowserUiPrefab, uiCanvas.transform);
 				fileBrowserUiInstance.name = "FileBrowserUI";
@@ -142,7 +139,7 @@ namespace GracesGames {
 
 			// Hook up DirectoryBackward method to DirectoryBackwardButton
 			FindButtonAndAddOnClickListener("DirectoryBackButton", DirectoryBack);
-			// Hook up DirectoryUp method to DirectoryUpButton
+			// Hook up DirectoryForward method to DirectoryForwardButton
 			FindButtonAndAddOnClickListener("DirectoryForwardButton", DirectoryForward);
 			// Hook up DirectoryUp method to DirectoryUpButton
 			FindButtonAndAddOnClickListener("DirectoryUpButton",DirectoryUp);
@@ -173,6 +170,7 @@ namespace GracesGames {
 			_searchInputField.onValueChanged.AddListener(UpdateSearchFilter);
 		}
 		
+		// Returns to the previously selected directory (inverse of DirectoryForward)
 		private void DirectoryBack() {
 			// See if there is anything on the backward stack
 			if (_backwardStack.Count > 0) {
@@ -188,6 +186,7 @@ namespace GracesGames {
 			}
 		}
 
+		// Goes forward to the previously selected directory (inverse of DirectoryBack)
 		private void DirectoryForward() {
 			// See if there is anything on the redo stack
 			if (_forwardStack.Count > 0){
@@ -204,21 +203,18 @@ namespace GracesGames {
 		}
 
 		// Moves one directory up and update file browser
-		// Limited to 1/WaitTimeBetweenClicks clicks per second to not skip directories
+		// When there is no parent, show the drives of the computer
 		private void DirectoryUp() {
-			if (Time.time >= _timestamp) {
-				_backwardStack.Push(_currentPath);
-				_timestamp = Time.time + WaitTimeBetweenClicks;
-				if (Directory.GetParent(_currentPath) != null) {
-					_currentPath = Directory.GetParent(_currentPath).FullName;
-					UpdateFileBrowser();
-				} else {
-					_currentPath = "/";
-					UpdateFileBrowser(true);
-				}
+			_backwardStack.Push(_currentPath);
+			if (Directory.GetParent(_currentPath) != null) {
+				_currentPath = Directory.GetParent(_currentPath).FullName;
+				UpdateFileBrowser();
+			} else {
+				_currentPath = "/";
+				UpdateFileBrowser(true);
 			}
 		}
-		
+
 		// Closes the file browser and send back an empty string
 		private void CloseFileBrowser() {
 			SendCallbackMessage("");
@@ -262,18 +258,45 @@ namespace GracesGames {
 
 		// Updates the file browser by updating the path, file name, directories and files
 		private void UpdateFileBrowser(bool topLevel = false) {
-			// Update the path text
+			UpdatePathText();
+			UpdateLoadFileText();
+			ResetParents();
+			BuildDirectories(topLevel);
+			BuildFiles();
+		}
+
+		// Update the path text
+		private void UpdatePathText() {
 			if (_pathText != null && _pathText.GetComponent<Text>() != null) {
 				_pathText.GetComponent<Text>().text = _currentPath;
 			}
-			// Update the file to load text
+		}
+		
+		// Update the file to load text
+		private void UpdateLoadFileText() {
 			if (_loadFileText != null && _loadFileText.GetComponent<Text>() != null) {
 				_loadFileText.GetComponent<Text>().text = _currentFile;
 			}
+		}
 
+		// Reset the directories and files parent game objects
+		private void ResetParents() {
 			// Remove all current game objects under the directories parent
 			ResetParent(_directoriesParent);
+			// Remove all current game objects under the files parent
+			ResetParent(_filesParent);
+		}
+		
+		// Remove all current game objects under the parent game object
+		private void ResetParent(GameObject parent) {
+			if (parent.transform.childCount > 0) {
+				foreach (Transform child in parent.transform) {
+					GameObject.Destroy(child.gameObject);
+				}
+			}
+		}
 
+		private void BuildDirectories(bool topLevel) {
 			// Get the directories
 			string[] directories = Directory.GetDirectories(_currentPath);
 			// If the top level is reached return the drives
@@ -288,10 +311,33 @@ namespace GracesGames {
 			foreach (string dir in directories) {
 				CreateDirectoryButton(dir);
 			}
+		}
 
-			// Remove all current game objects under the files parent
-			ResetParent(_filesParent);
+		// Returns whether the application is run on a Windows Operating System
+		private bool IsWindowsPlatform() {
+			return (Application.platform == RuntimePlatform.WindowsEditor ||
+			        Application.platform == RuntimePlatform.WindowsPlayer);
+		}
 
+		// Returns whether the application is run on a Mac Operating System
+		private bool IsMacOsPlatform() {
+			return (Application.platform == RuntimePlatform.OSXEditor ||
+			        Application.platform == RuntimePlatform.OSXPlayer ||
+			        Application.platform == RuntimePlatform.OSXDashboardPlayer);
+		}
+		
+		// Creates a directory button given a directory
+		private void CreateDirectoryButton(string directory) {
+			GameObject button = Instantiate(DirectoryButtonPrefab, Vector3.zero, Quaternion.identity);
+			button.GetComponent<Text>().text = new DirectoryInfo(directory).Name;
+			button.transform.SetParent(_directoriesParent.transform, false);
+			button.transform.localScale = Vector3.one;
+			button.GetComponent<Button>().onClick.AddListener(() => {
+				DirectoryClick(directory);
+			});
+		}
+
+		private void BuildFiles() {
 			// Get the files
 			string[] files = Directory.GetFiles(_currentPath);
 			// Apply search filter when not empty
@@ -311,39 +357,6 @@ namespace GracesGames {
 				}
 
 			}
-		}
-		
-		// Returns whether the application is run on a Windows Operating System
-		private bool IsWindowsPlatform() {
-			return (Application.platform == RuntimePlatform.WindowsEditor ||
-			        Application.platform == RuntimePlatform.WindowsPlayer);
-		}
-
-		// Returns whether the application is run on a Mac Operating System
-		private bool IsMacOsPlatform() {
-			return (Application.platform == RuntimePlatform.OSXEditor ||
-			        Application.platform == RuntimePlatform.OSXPlayer ||
-			        Application.platform == RuntimePlatform.OSXDashboardPlayer);
-		}
-
-		// Remove all current game objects under the parent game object
-		private void ResetParent(GameObject parent) {
-			if (parent.transform.childCount > 0) {
-				foreach (Transform child in parent.transform) {
-					GameObject.Destroy(child.gameObject);
-				}
-			}
-		}
-		
-		// Creates a directory button given a directory
-		private void CreateDirectoryButton(string directory) {
-			GameObject button = Instantiate(DirectoryButtonPrefab, Vector3.zero, Quaternion.identity);
-			button.GetComponent<Text>().text = new DirectoryInfo(directory).Name;
-			button.transform.SetParent(_directoriesParent.transform, false);
-			button.transform.localScale = Vector3.one;
-			button.GetComponent<Button>().onClick.AddListener(() => {
-				DirectoryClick(directory);
-			});
 		}
 		
 		// Apply search filter to string array of files and return filtered string array
