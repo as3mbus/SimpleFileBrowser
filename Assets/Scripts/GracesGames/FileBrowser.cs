@@ -80,7 +80,7 @@ namespace GracesGames {
 		private string _callbackMethod;
 		
 		// The current path of the file browser
-		// Starts using the current directory of the Unity Project
+		// Instantiated using the current directory of the Unity Project
 		private string _currentPath = Directory.GetCurrentDirectory();
 
 		// The currently selected file
@@ -114,7 +114,7 @@ namespace GracesGames {
 			}
 		}
 
-		// Tries to find a button by name and add a on click listener action to it
+		// Tries to find a button by name and add an on click listener action to it
 		// Returns the resulting button 
 		private GameObject FindButtonAndAddOnClickListener(string buttonName, UnityAction listenerAction) {
 			GameObject button = FindGameObjectOrError(buttonName);
@@ -138,7 +138,7 @@ namespace GracesGames {
 			}
 
 			// Hook up DirectoryBackward method to DirectoryBackwardButton
-			FindButtonAndAddOnClickListener("DirectoryBackButton", DirectoryBack);
+			FindButtonAndAddOnClickListener("DirectoryBackButton", DirectoryBackward);
 			// Hook up DirectoryForward method to DirectoryForwardButton
 			FindButtonAndAddOnClickListener("DirectoryForwardButton", DirectoryForward);
 			// Hook up DirectoryUp method to DirectoryUpButton
@@ -171,7 +171,7 @@ namespace GracesGames {
 		}
 		
 		// Returns to the previously selected directory (inverse of DirectoryForward)
-		private void DirectoryBack() {
+		private void DirectoryBackward() {
 			// See if there is anything on the backward stack
 			if (_backwardStack.Count > 0) {
 				// If so, push it to the forward stack
@@ -186,7 +186,7 @@ namespace GracesGames {
 			}
 		}
 
-		// Goes forward to the previously selected directory (inverse of DirectoryBack)
+		// Goes forward to the previously selected directory (inverse of DirectoryBackward)
 		private void DirectoryForward() {
 			// See if there is anything on the redo stack
 			if (_forwardStack.Count > 0){
@@ -265,21 +265,21 @@ namespace GracesGames {
 			BuildFiles();
 		}
 
-		// Update the path text
+		// Updates the path text
 		private void UpdatePathText() {
 			if (_pathText != null && _pathText.GetComponent<Text>() != null) {
 				_pathText.GetComponent<Text>().text = _currentPath;
 			}
 		}
 		
-		// Update the file to load text
+		// Updates the file to load text
 		private void UpdateLoadFileText() {
 			if (_loadFileText != null && _loadFileText.GetComponent<Text>() != null) {
 				_loadFileText.GetComponent<Text>().text = _currentFile;
 			}
 		}
 
-		// Reset the directories and files parent game objects
+		// Resets the directories and files parent game objects
 		private void ResetParents() {
 			// Remove all current game objects under the directories parent
 			ResetParent(_directoriesParent);
@@ -287,7 +287,7 @@ namespace GracesGames {
 			ResetParent(_filesParent);
 		}
 		
-		// Remove all current game objects under the parent game object
+		// Removes all current game objects under the parent game object
 		private void ResetParent(GameObject parent) {
 			if (parent.transform.childCount > 0) {
 				foreach (Transform child in parent.transform) {
@@ -296,6 +296,7 @@ namespace GracesGames {
 			}
 		}
 
+		// Creates a DirectoryButton for each directory in the current path
 		private void BuildDirectories(bool topLevel) {
 			// Get the directories
 			string[] directories = Directory.GetDirectories(_currentPath);
@@ -337,6 +338,7 @@ namespace GracesGames {
 			});
 		}
 
+		// Creates a FileButton for each file in the current path
 		private void BuildFiles() {
 			// Get the files
 			string[] files = Directory.GetFiles(_currentPath);
@@ -361,6 +363,7 @@ namespace GracesGames {
 		
 		// Apply search filter to string array of files and return filtered string array
 		private string[] ApplyFileSearchFilter(string[] files) {
+			// Keep files that whose name contains the search filter text
 			return files.Where(file =>
 				(!String.IsNullOrEmpty(file) &&
 				 Path.GetFileName(file).IndexOf(_searchFilter, StringComparison.OrdinalIgnoreCase) >= 0)).ToArray();
