@@ -1,6 +1,6 @@
 # Simple File Browser for Unity
 
-Available in the ![Unity Asset Store](https://www.assetstore.unity3d.com/en/#!/content/98451)
+Available in the [Unity Asset Store](https://www.assetstore.unity3d.com/en/#!/content/98451)
 
 This package allows the user to browse the file system in the Unity Editor and their Unity Game.  
 
