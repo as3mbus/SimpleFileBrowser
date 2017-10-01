@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 // Include these namespaces to use BinaryFormatter
@@ -63,7 +64,8 @@ namespace GracesGames {
 
 		// Saves a file with the textToSave using a path
 		private void SaveFileUsingPath(string path) {
-			if (path.Length != 0) {
+			// Make sure path and _textToSave is not null or empty
+			if (String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(_textToSave)) {
 				BinaryFormatter bFormatter = new BinaryFormatter();
 				// Create a file using the path
 				FileStream file = File.Create(path);
@@ -72,7 +74,7 @@ namespace GracesGames {
 				// Close the created file
 				file.Close();
 			} else {
-				Debug.Log("Invalid path given");
+				Debug.Log("Invalid path or empty file given");
 			}
 		}
 
