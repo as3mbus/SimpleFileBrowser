@@ -36,3 +36,7 @@ sysinfo.txt
 # idea and Plugins
 /.idea
 /Assets/Plugins*
+#submodule
+/*.meta
+/ProjectSettings/*.meta
+/Images/*.meta
