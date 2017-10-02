@@ -42,6 +42,9 @@ namespace GracesGames {
 		[Range(0.0f, 1.0f)]
 		public float FileBrowserScale = 1f;
 
+		//conditional to divide file and driectory to different panel (UI dependent)
+		public bool DivideFileDirectory =true;
+
 		// Input field and variable to allow file search
 		private InputField _searchInputField;
 		private string _searchFilter = "";
@@ -159,11 +162,19 @@ namespace GracesGames {
 			_saveFileTextInputFile = _saveFileText.GetComponent<InputField>();
 			_saveFileTextInputFile.onValueChanged.AddListener(CheckValidFileName);
 
-			// Find directories parent to group directory buttons
-			_directoriesParent = FindGameObjectOrError("Directories");
-			// Find files parent to group file buttons
-			_filesParent = FindGameObjectOrError("Files");
-			
+			if (DivideFileDirectory){
+				// Find directories parent to group directory buttons
+				_directoriesParent = FindGameObjectOrError("Directories");
+				// Find files parent to group file buttons
+				_filesParent = FindGameObjectOrError("Files");
+			}
+			else{
+				// Find directories parent to group directory buttons
+				_directoriesParent = FindGameObjectOrError("Files");
+				// Find files parent to group file buttons
+				_filesParent = FindGameObjectOrError("Files");
+			}
+
 			// Find search input field and get input field component
 			// and hook up onValueChanged listener to update search results on value change
 			_searchInputField = FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
@@ -301,6 +312,9 @@ namespace GracesGames {
 			// Get the directories
 			string[] directories = Directory.GetDirectories(_currentPath);
 			// If the top level is reached return the drives
+			if (!String.IsNullOrEmpty(_searchFilter)) {
+				directories = ApplyFileSearchFilter(directories);
+			}
 			if (topLevel) {
 				if (IsWindowsPlatform()) {
 					directories = Directory.GetLogicalDrives();
@@ -330,7 +344,15 @@ namespace GracesGames {
 		// Creates a directory button given a directory
 		private void CreateDirectoryButton(string directory) {
 			GameObject button = Instantiate(DirectoryButtonPrefab, Vector3.zero, Quaternion.identity);
-			button.GetComponent<Text>().text = new DirectoryInfo(directory).Name;
+			try
+			{	
+				button.GetComponentInChildren<Text>().text = new DirectoryInfo(directory).Name;
+			}
+			catch (System.Exception)
+			{
+				button.GetComponent<Text>().text = new DirectoryInfo(directory).Name;	
+				throw;
+			}
 			button.transform.SetParent(_directoriesParent.transform, false);
 			button.transform.localScale = Vector3.one;
 			button.GetComponent<Button>().onClick.AddListener(() => {
@@ -376,7 +398,15 @@ namespace GracesGames {
 			if (_mode == FileBrowserMode.Load) {
 				DisableWrongExtensionFiles(button, file);
 			}
-			button.GetComponent<Text>().text = Path.GetFileName(file);
+			try{
+
+				button.GetComponentInChildren<Text>().text = Path.GetFileName(file);
+			}
+			catch(System.Exception){
+
+				button.GetComponentInChildren<Text>().text = Path.GetFileName(file);
+				throw;
+			}
 			button.transform.SetParent(_filesParent.transform, false);
 			button.transform.localScale = Vector3.one;
 			button.GetComponent<Button>().onClick.AddListener(() => {
