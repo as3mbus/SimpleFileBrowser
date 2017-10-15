@@ -65,7 +65,7 @@ namespace GracesGames {
 		// Saves a file with the textToSave using a path
 		private void SaveFileUsingPath(string path) {
 			// Make sure path and _textToSave is not null or empty
-			if (String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(_textToSave)) {
+			if (!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(_textToSave)) {
 				BinaryFormatter bFormatter = new BinaryFormatter();
 				// Create a file using the path
 				FileStream file = File.Create(path);
