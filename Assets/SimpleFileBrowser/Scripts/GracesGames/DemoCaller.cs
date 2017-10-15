@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace GracesGames {
+namespace SimpleFileBrowser.Scripts.GracesGames {
 	// Demo class to illustrate the usage of the FileBrowser script
 	// Able to save and load files containing serialized data (e.g. text)
 	public class DemoCaller : MonoBehaviour {
