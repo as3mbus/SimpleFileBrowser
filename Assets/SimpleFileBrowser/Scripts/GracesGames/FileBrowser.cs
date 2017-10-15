@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine.Events;
 
-namespace GracesGames {
+namespace SimpleFileBrowser.Scripts.GracesGames {
 
 	// Enum used to define save and load mode
 	public enum FileBrowserMode {
