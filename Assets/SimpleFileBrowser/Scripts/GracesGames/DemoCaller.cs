@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace GracesGames {
+namespace SimpleFileBrowser.Scripts.GracesGames {
 	// Demo class to illustrate the usage of the FileBrowser script
 	// Able to save and load files containing serialized data (e.g. text)
 	public class DemoCaller : MonoBehaviour {
@@ -25,6 +25,8 @@ namespace GracesGames {
 
 		// Variable to save intermediate input result
 		private string _textToSave;
+
+		public bool PortraitMode;
 
 		// Find the input field, label objects and add a onValueChanged listener to the input field
 		private void Start() {
@@ -51,10 +53,11 @@ namespace GracesGames {
 		// Open a file browser to save and load files
 		public void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
 			// Create the file browser and name it
-			GameObject fileBrowserObject = Instantiate(FileBrowserPrefab, this.transform);
+			GameObject fileBrowserObject = Instantiate(FileBrowserPrefab, transform);
 			fileBrowserObject.name = "FileBrowser";
 			// Set the mode to save or load
 			FileBrowser fileBrowserScript = fileBrowserObject.GetComponent<FileBrowser>();
+			fileBrowserScript.SetupFileBrowser(PortraitMode ? ViewMode.Portrait : ViewMode.Landscape);
 			if (fileBrowserMode == FileBrowserMode.Save) {
 				fileBrowserScript.SaveFilePanel(this, "SaveFileUsingPath", "DemoText", FileExtension);
 			} else {
@@ -65,7 +68,7 @@ namespace GracesGames {
 		// Saves a file with the textToSave using a path
 		private void SaveFileUsingPath(string path) {
 			// Make sure path and _textToSave is not null or empty
-			if (String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(_textToSave)) {
+			if (!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(_textToSave)) {
 				BinaryFormatter bFormatter = new BinaryFormatter();
 				// Create a file using the path
 				FileStream file = File.Create(path);

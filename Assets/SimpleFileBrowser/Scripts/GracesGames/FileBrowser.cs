@@ -5,12 +5,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine.Events;
 
-namespace GracesGames {
+namespace SimpleFileBrowser.Scripts.GracesGames {
 
 	// Enum used to define save and load mode
 	public enum FileBrowserMode {
 		Save,
 		Load
+	}
+
+	public enum ViewMode {
+		Landscape,
+		Portrait
 	}
 
 	public class FileBrowser : MonoBehaviour {
@@ -19,6 +24,9 @@ namespace GracesGames {
 		
 		// The File Browser UI as prefab
 		public GameObject FileBrowserUiPrefab;
+		
+		// The File Browser UI Portrait mode as prefab
+		public GameObject FileBrowserUiPortraitPrefab;
 		
 		// Button Prefab used to create a button for each directory in the current path
 		public GameObject DirectoryButtonPrefab;
@@ -34,6 +42,9 @@ namespace GracesGames {
 		
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
+		// Whether directories and files should be displayed into one panel
+		public ViewMode ViewMode = ViewMode.Landscape;
+		
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
 		
@@ -41,9 +52,6 @@ namespace GracesGames {
 		// Represented using a 0-1 slider in the editor
 		[Range(0.0f, 1.0f)]
 		public float FileBrowserScale = 1f;
-
-		//conditional to divide file and driectory to different panel (UI dependent)
-		public bool DivideFileDirectory =true;
 
 		// Input field and variable to allow file search
 		private InputField _searchInputField;
@@ -100,11 +108,6 @@ namespace GracesGames {
 		private string _fileExtension;
 
 		// ----- METHODS -----
-		
-		// On Awake, set up the File Browser
-		private void Awake() {
-			SetupFileBrowser();
-		}
 
 		// Finds and returns a game object by name or prints an error and return null
 		private GameObject FindGameObjectOrError(string objectName) {
@@ -125,17 +128,32 @@ namespace GracesGames {
 			return button;
 		}
 
-		private void SetupFileBrowser() {
+		// Method used to setup the FileBrowser
+		public void SetupFileBrowser(ViewMode newViewMode) {
+			// Set the view mode (landscape or portrait)
+			ViewMode = newViewMode;
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
-			if (uiCanvas == null) {
+			if (uiCanvas != null) {
+				if (ViewMode == ViewMode.Portrait) {
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(720, 1280);
+				} else {
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1280, 720);
+				}
+			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
 			// Instantiate the file browser UI using the transform of the canvas
 			// After creation, name it and scale it
 			if (uiCanvas != null) {
-				GameObject fileBrowserUiInstance = Instantiate(FileBrowserUiPrefab, uiCanvas.transform);
+				GameObject fileBrowserUiInstance;
+				if (ViewMode == ViewMode.Portrait) {
+					fileBrowserUiInstance = Instantiate(FileBrowserUiPortraitPrefab, uiCanvas.transform);
+
+				} else {
+					fileBrowserUiInstance = Instantiate(FileBrowserUiPrefab, uiCanvas.transform);
+				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
 			}
@@ -162,19 +180,19 @@ namespace GracesGames {
 			_saveFileTextInputFile = _saveFileText.GetComponent<InputField>();
 			_saveFileTextInputFile.onValueChanged.AddListener(CheckValidFileName);
 
-			if (DivideFileDirectory){
+
+			if (ViewMode == ViewMode.Portrait) {
+				// Find directories parent to group directory buttons
+				_directoriesParent = FindGameObjectOrError("Items");
+				// Find files parent to group file buttons
+				_filesParent = FindGameObjectOrError("Items");
+			} else {
 				// Find directories parent to group directory buttons
 				_directoriesParent = FindGameObjectOrError("Directories");
 				// Find files parent to group file buttons
 				_filesParent = FindGameObjectOrError("Files");
 			}
-			else{
-				// Find directories parent to group directory buttons
-				_directoriesParent = FindGameObjectOrError("Files");
-				// Find files parent to group file buttons
-				_filesParent = FindGameObjectOrError("Files");
-			}
-
+			
 			// Find search input field and get input field component
 			// and hook up onValueChanged listener to update search results on value change
 			_searchInputField = FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
@@ -337,8 +355,7 @@ namespace GracesGames {
 		// Returns whether the application is run on a Mac Operating System
 		private bool IsMacOsPlatform() {
 			return (Application.platform == RuntimePlatform.OSXEditor ||
-			        Application.platform == RuntimePlatform.OSXPlayer ||
-			        Application.platform == RuntimePlatform.OSXDashboardPlayer);
+			        Application.platform == RuntimePlatform.OSXPlayer);
 		}
 		
 		// Creates a directory button given a directory
