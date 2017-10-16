@@ -73,7 +73,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224053474994788836}
   m_Layer: 5
-  m_Name: FileBrowserUIPortrait
+  m_Name: FileBrowserPortraitUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -22,11 +22,11 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		
 		// ----- PUBLIC UI ELEMENTS -----
 		
-		// The File Browser UI as prefab
-		public GameObject FileBrowserUiPrefab;
+		// The File Browser UI Landscape mode as prefab
+		public GameObject FileBrowserLandscapeUiPrefab;
 		
 		// The File Browser UI Portrait mode as prefab
-		public GameObject FileBrowserUiPortraitPrefab;
+		public GameObject FileBrowserPortraitUiPrefab;
 		
 		// Button Prefab used to create a button for each directory in the current path
 		public GameObject DirectoryButtonPrefab;
@@ -42,7 +42,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
-		// Whether directories and files should be displayed into one panel
+		// Whether directories and files should be displayed in one panel
 		public ViewMode ViewMode = ViewMode.Landscape;
 		
 		// Whether files with incompatible extensions should be hidden
@@ -58,6 +58,12 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private string _searchFilter = "";
 		
 		// ----- PRIVATE UI ELEMENTS ------
+		
+		// The x value of the window size 
+		private const int WindowX = 1280;
+
+		// The y value of the windows size
+		private const int WindowY = 720;
 
 		// Button used to select a file to save/load
 		private GameObject _selectFileButton;
@@ -136,9 +142,9 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			GameObject uiCanvas = GameObject.Find("Canvas");
 			if (uiCanvas != null) {
 				if (ViewMode == ViewMode.Portrait) {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(720, 1280);
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(WindowY, WindowX);
 				} else {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1280, 720);
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(WindowX, WindowY);
 				}
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
@@ -149,10 +155,10 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			if (uiCanvas != null) {
 				GameObject fileBrowserUiInstance;
 				if (ViewMode == ViewMode.Portrait) {
-					fileBrowserUiInstance = Instantiate(FileBrowserUiPortraitPrefab, uiCanvas.transform);
+					fileBrowserUiInstance = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform);
 
 				} else {
-					fileBrowserUiInstance = Instantiate(FileBrowserUiPrefab, uiCanvas.transform);
+					fileBrowserUiInstance = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform);
 				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
