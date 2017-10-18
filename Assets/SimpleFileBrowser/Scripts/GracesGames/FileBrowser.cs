@@ -157,10 +157,10 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			if (uiCanvas != null) {
 				GameObject fileBrowserUiInstance;
 				if (ViewMode == ViewMode.Portrait) {
-					fileBrowserUiInstance = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform);
+					fileBrowserUiInstance = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform, false);
 
 				} else {
-					fileBrowserUiInstance = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform);
+					fileBrowserUiInstance = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform, false);
 				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
