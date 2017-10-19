@@ -60,10 +60,10 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// ----- PRIVATE UI ELEMENTS ------
 		
 		// The x value of the window size 
-		private const int WindowX = 1280;
+		private int _windowX;
 
 		// The y value of the windows size
-		private const int WindowY = 720;
+		private int _windowY;
 
 		// Button used to select a file to save/load
 		private GameObject _selectFileButton;
@@ -138,13 +138,15 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		public void SetupFileBrowser(ViewMode newViewMode) {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
+			_windowX = Screen.width;
+			_windowY = Screen.height;
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
 			if (uiCanvas != null) {
 				if (ViewMode == ViewMode.Portrait) {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(WindowY, WindowX);
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowY, _windowX);
 				} else {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(WindowX, WindowY);
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowX, _windowY);
 				}
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
