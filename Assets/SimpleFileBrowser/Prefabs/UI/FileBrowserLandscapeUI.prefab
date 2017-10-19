@@ -127,7 +127,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224482201015806794}
   m_Layer: 5
-  m_Name: FileBrowserUI
+  m_Name: FileBrowserLandscapeUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -623,7 +623,7 @@ MonoBehaviour:
     m_FontSize: 14
     m_FontStyle: 2
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -670,7 +670,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114539922312554618}
   m_HandleRect: {fileID: 224766940845681846}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1938,7 +1938,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114978025346461986}
   m_HandleRect: {fileID: 224245007398213960}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

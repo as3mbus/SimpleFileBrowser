@@ -13,12 +13,20 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		Load
 	}
 
+	public enum ViewMode {
+		Landscape,
+		Portrait
+	}
+
 	public class FileBrowser : MonoBehaviour {
 		
 		// ----- PUBLIC UI ELEMENTS -----
 		
-		// The File Browser UI as prefab
-		public GameObject FileBrowserUiPrefab;
+		// The File Browser UI Landscape mode as prefab
+		public GameObject FileBrowserLandscapeUiPrefab;
+		
+		// The File Browser UI Portrait mode as prefab
+		public GameObject FileBrowserPortraitUiPrefab;
 		
 		// Button Prefab used to create a button for each directory in the current path
 		public GameObject DirectoryButtonPrefab;
@@ -34,6 +42,9 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
+		// Whether directories and files should be displayed in one panel
+		public ViewMode ViewMode = ViewMode.Landscape;
+		
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
 		
@@ -47,6 +58,12 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private string _searchFilter = "";
 		
 		// ----- PRIVATE UI ELEMENTS ------
+		
+		// The x value of the window size 
+		private int _windowX;
+
+		// The y value of the windows size
+		private int _windowY;
 
 		// Button used to select a file to save/load
 		private GameObject _selectFileButton;
@@ -97,11 +114,6 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private string _fileExtension;
 
 		// ----- METHODS -----
-		
-		// On Awake, set up the File Browser
-		private void Awake() {
-			SetupFileBrowser();
-		}
 
 		// Finds and returns a game object by name or prints an error and return null
 		private GameObject FindGameObjectOrError(string objectName) {
@@ -122,17 +134,34 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			return button;
 		}
 
-		private void SetupFileBrowser() {
+		// Method used to setup the FileBrowser
+		public void SetupFileBrowser(ViewMode newViewMode) {
+			// Set the view mode (landscape or portrait)
+			ViewMode = newViewMode;
+			_windowX = Screen.width;
+			_windowY = Screen.height;
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
-			if (uiCanvas == null) {
+			if (uiCanvas != null) {
+				if (ViewMode == ViewMode.Portrait) {
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowY, _windowX);
+				} else {
+					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowX, _windowY);
+				}
+			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
 			// Instantiate the file browser UI using the transform of the canvas
 			// After creation, name it and scale it
 			if (uiCanvas != null) {
-				GameObject fileBrowserUiInstance = Instantiate(FileBrowserUiPrefab, uiCanvas.transform);
+				GameObject fileBrowserUiInstance;
+				if (ViewMode == ViewMode.Portrait) {
+					fileBrowserUiInstance = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform);
+
+				} else {
+					fileBrowserUiInstance = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform);
+				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
 			}
@@ -159,10 +188,17 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			_saveFileTextInputFile = _saveFileText.GetComponent<InputField>();
 			_saveFileTextInputFile.onValueChanged.AddListener(CheckValidFileName);
 
-			// Find directories parent to group directory buttons
-			_directoriesParent = FindGameObjectOrError("Directories");
-			// Find files parent to group file buttons
-			_filesParent = FindGameObjectOrError("Files");
+			if (ViewMode == ViewMode.Portrait) {
+				// Find directories parent to group directory buttons
+				_directoriesParent = FindGameObjectOrError("Items");
+				// Find files parent to group file buttons
+				_filesParent = FindGameObjectOrError("Items");
+			} else {
+				// Find directories parent to group directory buttons
+				_directoriesParent = FindGameObjectOrError("Directories");
+				// Find files parent to group file buttons
+				_filesParent = FindGameObjectOrError("Files");
+			}
 			
 			// Find search input field and get input field component
 			// and hook up onValueChanged listener to update search results on value change
