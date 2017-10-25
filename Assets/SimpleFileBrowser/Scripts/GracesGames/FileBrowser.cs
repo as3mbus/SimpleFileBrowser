@@ -58,12 +58,6 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private string _searchFilter = "";
 		
 		// ----- PRIVATE UI ELEMENTS ------
-		
-		// The x value of the window size 
-		private int _windowX;
-
-		// The y value of the windows size
-		private int _windowY;
 
 		// Button used to select a file to save/load
 		private GameObject _selectFileButton;
@@ -138,20 +132,9 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		public void SetupFileBrowser(ViewMode newViewMode) {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
-			_windowX = Screen.width;
-			_windowY = Screen.height;
+			
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
-			if (uiCanvas != null) {
-				if (ViewMode == ViewMode.Portrait) {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowY, _windowX);
-				} else {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(_windowX, _windowY);
-				}
-			} else {
-				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
-			}
-
 			// Instantiate the file browser UI using the transform of the canvas
 			// After creation, name it and scale it
 			if (uiCanvas != null) {
@@ -164,6 +147,8 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
+			} else {
+				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
 			// Hook up DirectoryBackward method to DirectoryBackwardButton
