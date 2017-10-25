@@ -132,19 +132,9 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		public void SetupFileBrowser(ViewMode newViewMode) {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
+			
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
-			if (uiCanvas != null) {
-				Vector2 referenceResolution = uiCanvas.GetComponent<CanvasScaler>().referenceResolution;
-				if (ViewMode == ViewMode.Portrait) {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(referenceResolution.y, referenceResolution.x);
-				} else {
-					uiCanvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(referenceResolution.x, referenceResolution.y);
-				}
-			} else {
-				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
-			}
-
 			// Instantiate the file browser UI using the transform of the canvas
 			// After creation, name it and scale it
 			if (uiCanvas != null) {
@@ -157,6 +147,8 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				}
 				fileBrowserUiInstance.name = "FileBrowserUI";
 				fileBrowserUiInstance.transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
+			} else {
+				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
 			// Hook up DirectoryBackward method to DirectoryBackwardButton
