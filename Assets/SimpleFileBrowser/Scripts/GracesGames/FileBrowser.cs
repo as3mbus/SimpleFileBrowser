@@ -19,15 +19,15 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 	}
 
 	public class FileBrowser : MonoBehaviour {
-		
+
 		// ----- PUBLIC UI ELEMENTS -----
-		
+
 		// The File Browser UI Landscape mode as prefab
 		public GameObject FileBrowserLandscapeUiPrefab;
-		
+
 		// The File Browser UI Portrait mode as prefab
 		public GameObject FileBrowserPortraitUiPrefab;
-		
+
 		// Button Prefab used to create a button for each directory in the current path
 		public GameObject DirectoryButtonPrefab;
 
@@ -39,34 +39,35 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Sprite used to represent the load button
 		public Sprite LoadImage;
-		
+
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
 		// Whether directories and files should be displayed in one panel
 		public ViewMode ViewMode = ViewMode.Landscape;
-		
+
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
-		
+
 		// Dimension used to set the scale of the UI
 		// Represented using a 0-1 slider in the editor
-		[Range(0.0f, 1.0f)]
-		public float FileBrowserScale = 1f;
+		[Range(0.0f, 1.0f)] public float FileBrowserScale = 1f;
 
 		// Input field and variable to allow file search
 		private InputField _searchInputField;
+
 		private string _searchFilter = "";
-		
+
 		// ----- PRIVATE UI ELEMENTS ------
 
 		// Button used to select a file to save/load
 		private GameObject _selectFileButton;
-		
+
 		// Game object that represents the current path
 		private GameObject _pathText;
 
 		// Game object  and  InputField that represents the name of the file to save
 		private GameObject _saveFileText;
+
 		private InputField _saveFileTextInputFile;
 
 		// Game object (Text) that represents the name of the file to load
@@ -79,20 +80,20 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private GameObject _filesParent;
 
 		// ----- Private FILE BROWSER SETTINGS -----
-		
+
 		// Variable to set save or load mode
 		private FileBrowserMode _mode;
-		
+
 		// MonoBehaviour script used to call this script
 		// Saved for the call back with the (empty) result
 		private MonoBehaviour _callerScript;
 
 		// Method to be called of the callerScript when selecting a file or closing the file browser
 		private string _callbackMethod;
-		
+
 		// The current path of the file browser
 		// Instantiated using the current directory of the Unity Project
-		private string _currentPath = Directory.GetCurrentDirectory();
+		private string _currentPath;
 
 		// The currently selected file
 		private string _currentFile;
@@ -100,9 +101,13 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// The name for file to be saved
 		private string _saveFileName;
 
+		// Location of Android root directory, can be different for different device manufacturers
+		private string _rootAndroidPath;
+
 		// Stacks to keep track for backward and forward navigation feature
-		private readonly FiniteStack<string> _backwardStack = new FiniteStack<string> ();
-		private readonly FiniteStack<string> _forwardStack = new FiniteStack<string> ();
+		private readonly FiniteStack<string> _backwardStack = new FiniteStack<string>();
+
+		private readonly FiniteStack<string> _forwardStack = new FiniteStack<string>();
 
 		// String file extension to filter results and save new files
 		private string _fileExtension;
@@ -132,7 +137,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		public void SetupFileBrowser(ViewMode newViewMode) {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
-			
+
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
 			// Instantiate the file browser UI using the transform of the canvas
@@ -156,7 +161,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			// Hook up DirectoryForward method to DirectoryForwardButton
 			FindButtonAndAddOnClickListener("DirectoryForwardButton", DirectoryForward);
 			// Hook up DirectoryUp method to DirectoryUpButton
-			FindButtonAndAddOnClickListener("DirectoryUpButton",DirectoryUp);
+			FindButtonAndAddOnClickListener("DirectoryUpButton", DirectoryUp);
 			// Hook up CloseFileBrowser method to CloseFileBrowserButton
 			FindButtonAndAddOnClickListener("CloseFileBrowserButton", CloseFileBrowser);
 			// Hook up SelectFile method to SelectFileButton
@@ -184,22 +189,52 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				// Find files parent to group file buttons
 				_filesParent = FindGameObjectOrError("Files");
 			}
-			
+
 			// Find search input field and get input field component
 			// and hook up onValueChanged listener to update search results on value change
 			_searchInputField = FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
 			_searchInputField.onValueChanged.AddListener(UpdateSearchFilter);
+
+			if (IsAndroidPlatform()) {
+				SetupAndroidVariables();
+				_currentPath = _rootAndroidPath;
+			} else {
+				_currentPath = Directory.GetCurrentDirectory();
+			}
 		}
-		
+
+		// Set up Android external storage root directory, else default to Directory.GetCurrentDirectory()
+		private void SetupAndroidVariables() {
+			_rootAndroidPath = GetAndroidExternalFilesDir();
+		}
+
+		// Returns the external files directory for Android OS, else default to Directory.GetCurrentDirectory()
+		private String GetAndroidExternalFilesDir() {
+			string path = "";
+			if (IsAndroidPlatform()) {
+				try {
+					using (AndroidJavaClass androidJavaClass = new AndroidJavaClass("android.os.Environment")) {
+						path = androidJavaClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory")
+							.Call<string>("getAbsolutePath");
+					}
+				}
+				catch (Exception e) {
+					Debug.LogWarning("Error fetching native Android external storage dir: " + e.Message);
+					path = Directory.GetCurrentDirectory();
+				}
+			}
+			return path;
+		}
+
 		// Returns to the previously selected directory (inverse of DirectoryForward)
 		private void DirectoryBackward() {
 			// See if there is anything on the backward stack
 			if (_backwardStack.Count > 0) {
 				// If so, push it to the forward stack
-				_forwardStack.Push (_currentPath);
+				_forwardStack.Push(_currentPath);
 			}
 			// Get the last path entry
-			string backPath = _backwardStack.Pop ();
+			string backPath = _backwardStack.Pop();
 			if (backPath != null) {
 				// Set path and update the file browser
 				_currentPath = backPath;
@@ -210,7 +245,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// Goes forward to the previously selected directory (inverse of DirectoryBackward)
 		private void DirectoryForward() {
 			// See if there is anything on the redo stack
-			if (_forwardStack.Count > 0){
+			if (_forwardStack.Count > 0) {
 				// If so, push it to the backward stack
 				_backwardStack.Push(_currentPath);
 			}
@@ -227,20 +262,28 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// When there is no parent, show the drives of the computer
 		private void DirectoryUp() {
 			_backwardStack.Push(_currentPath);
-			if (Directory.GetParent(_currentPath) != null) {
+			if (!IsTopLevelReached()) {
 				_currentPath = Directory.GetParent(_currentPath).FullName;
 				UpdateFileBrowser();
 			} else {
-				_currentPath = "/";
 				UpdateFileBrowser(true);
 			}
+		}
+
+		// Parent directory check as Android throws a permission error if it tries to go above the root external storage directory
+		private bool IsTopLevelReached() {
+			if (IsAndroidPlatform()) {
+				return Directory.GetParent(_currentPath).FullName == Directory.GetParent(_rootAndroidPath).FullName;
+			}
+			return Directory.GetParent(_currentPath) == null;
+
 		}
 
 		// Closes the file browser and send back an empty string
 		private void CloseFileBrowser() {
 			SendCallbackMessage("");
 		}
-		
+
 		// When a file is selected (save/load button clicked), 
 		// send a message to the caller script
 		private void SelectFile() {
@@ -258,14 +301,14 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				SendCallbackMessage(_currentFile);
 			}
 		}
-		
+
 		// Sends back a message to the callerScript and callbackMethod
 		// Then destroys the FileBrowser
 		private void SendCallbackMessage(string message) {
 			_callerScript.SendMessage(_callbackMethod, message);
 			Destroy();
 		}
-		
+
 		// Checks the current value of the InputField. If it is an empty string, disable the save button
 		private void CheckValidFileName(string inputFieldValue) {
 			_selectFileButton.SetActive(inputFieldValue != "");
@@ -292,7 +335,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				_pathText.GetComponent<Text>().text = _currentPath;
 			}
 		}
-		
+
 		// Updates the file to load text
 		private void UpdateLoadFileText() {
 			if (_loadFileText != null && _loadFileText.GetComponent<Text>() != null) {
@@ -307,7 +350,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			// Remove all current game objects under the files parent
 			ResetParent(_filesParent);
 		}
-		
+
 		// Removes all current game objects under the parent game object
 		private void ResetParent(GameObject parent) {
 			if (parent.transform.childCount > 0) {
@@ -327,6 +370,9 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 					directories = Directory.GetLogicalDrives();
 				} else if (IsMacOsPlatform()) {
 					directories = Directory.GetDirectories("/Volumes");
+				} else if (IsAndroidPlatform()) {
+					_currentPath = _rootAndroidPath;
+					directories = Directory.GetDirectories(_currentPath);
 				}
 			}
 			// For each directory in the current directory, create a DirectoryButton and hook up the DirectoryClick method
@@ -341,12 +387,16 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			        Application.platform == RuntimePlatform.WindowsPlayer);
 		}
 
+		private bool IsAndroidPlatform() {
+			return Application.platform == RuntimePlatform.Android;
+		}
+
 		// Returns whether the application is run on a Mac Operating System
 		private bool IsMacOsPlatform() {
 			return (Application.platform == RuntimePlatform.OSXEditor ||
 			        Application.platform == RuntimePlatform.OSXPlayer);
 		}
-		
+
 		// Creates a directory button given a directory
 		private void CreateDirectoryButton(string directory) {
 			GameObject button = Instantiate(DirectoryButtonPrefab, Vector3.zero, Quaternion.identity);
@@ -380,7 +430,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 			}
 		}
-		
+
 		// Apply search filter to string array of files and return filtered string array
 		private string[] ApplyFileSearchFilter(string[] files) {
 			// Keep files that whose name contains the search filter text
@@ -436,7 +486,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			}
 			UpdateFileBrowser();
 		}
-		
+
 		// Updates the input field value with a file name and extension
 		public void SetFileNameInputField(string fileName, string fileExtension) {
 			_saveFileTextInputFile.text = fileName + "." + fileExtension;
