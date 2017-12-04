@@ -72,6 +72,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224053474994788836}
+  - component: {fileID: 114336219566676504}
   m_Layer: 5
   m_Name: FileBrowserPortraitUI
   m_TagString: Untagged
@@ -924,6 +925,18 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114336219566676504
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1110909879947270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3650ed10af8684db0922cd084e03e0af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FileBrowserScale: 1
 --- !u!114 &114377232483168896
 MonoBehaviour:
   m_ObjectHideFlags: 1
