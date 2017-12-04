@@ -36,16 +36,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			_loadedText = GameObject.Find("LoadedText");
 
 			GameObject uiCanvas = GameObject.Find("Canvas");
-			if (uiCanvas != null) {
-				// Set the canvas reference resolution based on view mode (portrait or landscape)
-				CanvasScaler canvasScaler = uiCanvas.GetComponent<CanvasScaler>();
-				Vector2 referenceResolution = canvasScaler.referenceResolution;
-				if (PortraitMode) {
-					canvasScaler.referenceResolution = new Vector2(referenceResolution.y, referenceResolution.x);
-				} else {
-					canvasScaler.referenceResolution = new Vector2(referenceResolution.x, referenceResolution.y);
-				}
-			} else {
+			if (uiCanvas == null) {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 		}
