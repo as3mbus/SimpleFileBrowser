@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 public abstract class SetupUserInterface : MonoBehaviour {
 
+	// The file browser using this user interface
 	private FileBrowser _fileBrowser;
 	
 	// Button used to select a file to save/load
@@ -21,29 +22,37 @@ public abstract class SetupUserInterface : MonoBehaviour {
 	private GameObject _loadFileText;
 
 	// Game object used as the parent for all the Directories of the current path
-	protected GameObject _directoriesParent;
+	protected GameObject DirectoriesParent;
 
 	// Game object used as the parent for all the Files of the current path
-	protected GameObject _filesParent;
+	protected GameObject FilesParent;
 	
 	// Input field and variable to allow file search
 	private InputField _searchInputField;
-	
-	// Dimension used to set the scale of the UI
-	// Represented using a 0-1 slider in the editor
-	[Range(0.0f, 1.0f)] public float FileBrowserScale = 1f;
 
-	// Use this for initialization
-	public void Setup(FileBrowser fileBrowser) {
+	// The default font size for labels such as current path, save file name etc.
+	private int _uiFontSize = 14;
+	
+	// The height of the directoy buttons
+	protected int DirectoryButtonHeight = 70;
+	
+	// The height of the files buttons
+	protected int FilesButtonHeight = 70;
+
+	// Setup the file browser user interface (get values from file browser prefab)
+	public void Setup(FileBrowser fileBrowser, float uiWindowScale, int uiFontSize, int directoryButtonHeight, int filesButtonHeight) {
 		_fileBrowser = fileBrowser;
 		name = "FileBrowserUI";
-		transform.localScale = new Vector3(FileBrowserScale, FileBrowserScale, 1f);
+		transform.localScale = new Vector3(uiWindowScale, uiWindowScale, 1f);
+		_uiFontSize = uiFontSize;
+		DirectoryButtonHeight = directoryButtonHeight;
+		FilesButtonHeight = filesButtonHeight;
 		SetupClickListeners();
 		SetupTextLabels();
 		SetupParents();
 		SetupSearchInputField();
 		_fileBrowser.SetUiGameObjects(_selectFileButton, _pathText, _loadFileText, _saveFileText, _saveFileTextInputFile,
-			_directoriesParent, _filesParent);
+			DirectoriesParent, FilesParent);
 	}
 
 	// Setup click listeners for buttons
@@ -62,6 +71,10 @@ public abstract class SetupUserInterface : MonoBehaviour {
 
 	// Setup path, load and save file text
 	private void SetupTextLabels() {
+		// Find the path and file label (path label optional in Portrait UI)
+		GameObject pathLabel = GameObject.Find("PathLabel");
+		GameObject fileLabel = FindGameObjectOrError("FileLabel");
+
 		// Find pathText game object to update path on clicks
 		_pathText = FindGameObjectOrError("PathText");
 		// Find loadText game object to update load file text on clicks
@@ -72,9 +85,20 @@ public abstract class SetupUserInterface : MonoBehaviour {
 		_saveFileText = FindGameObjectOrError("SaveFileText");
 		_saveFileTextInputFile = _saveFileText.GetComponent<InputField>();
 		_saveFileTextInputFile.onValueChanged.AddListener(_fileBrowser.CheckValidFileName);
+		
+		// Set font size for labels and texts
+		if (pathLabel != null) {
+			pathLabel.GetComponent<Text>().fontSize = _uiFontSize;
+		}
+		fileLabel.GetComponent<Text>().fontSize = _uiFontSize;
+		_pathText.GetComponent<Text>().fontSize = _uiFontSize;
+		_loadFileText.GetComponent<Text>().fontSize = _uiFontSize;
+		foreach (Text textComponent in _saveFileText.GetComponentsInChildren<Text>()) {
+			textComponent.fontSize = _uiFontSize;
+		}
 	}
 
-	// Setup parents object to hold directories and files
+	// Setup parents object to hold directories and files (implemented in Landscape and Portrait version)
 	protected abstract void SetupParents();
 
 	// Setup search filter
@@ -82,6 +106,9 @@ public abstract class SetupUserInterface : MonoBehaviour {
 		// Find search input field and get input field component
 		// and hook up onValueChanged listener to update search results on value change
 		_searchInputField = FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
+		foreach (Text textComponent in _searchInputField.GetComponentsInChildren<Text>()) {
+			textComponent.fontSize = _uiFontSize;
+		}
 		_searchInputField.onValueChanged.AddListener(_fileBrowser.UpdateSearchFilter);
 	}
 	
@@ -101,5 +128,12 @@ public abstract class SetupUserInterface : MonoBehaviour {
 		GameObject button = FindGameObjectOrError(buttonName);
 		button.GetComponent<Button>().onClick.AddListener(listenerAction);
 		return button;
+	}
+
+	// Sets the height of a GridLayoutGroup located in the game object (parent of directies and files object)
+	protected void SetButtonParentHeight(GameObject parent, int height) {
+		Vector2 cellSize = parent.GetComponent<GridLayoutGroup>().cellSize;
+		cellSize = new Vector2(cellSize.x, height);
+		parent.GetComponent<GridLayoutGroup>().cellSize = cellSize;
 	}
 }
