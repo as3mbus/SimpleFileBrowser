@@ -7,8 +7,8 @@
 			DirectoriesParent = FindGameObjectOrError("Items");
 			// Find files parent to group file buttons
 			FilesParent = FindGameObjectOrError("Items");
-			SetButtonParentHeight(DirectoriesParent, DirectoryButtonHeight);
-			SetButtonParentHeight(FilesParent, FilesButtonHeight);
+			SetButtonParentHeight(DirectoriesParent, ItemButtonHeight);
+			SetButtonParentHeight(FilesParent, ItemButtonHeight);
 		}
 	}
 }

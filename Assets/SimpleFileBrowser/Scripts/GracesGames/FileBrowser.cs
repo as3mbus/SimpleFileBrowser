@@ -55,20 +55,14 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// Represented using a 0-1 slider in the editor
 		[Range(0.0f, 1.0f)] public float FileBrowserUiScale = 1f;
 
-		// Height of the directory buttons
-		[Range(0.0f, 200.0f)] public int DirectoryButtonHeight = 70;
+		// Height of the directory and file buttons
+		[Range(0.0f, 200.0f)] public int ItemButtonHeight = 70;
 		
-		// Font size used for the directory buttons
-		[Range(0.0f, 72.0f)] public int DirectoryFontSize = 14;
-		
-		// Height of the file buttons
-		[Range(0.0f, 200.0f)] public int FilesButtonHeight = 70;
-		
-		// Font size used for the files buttons
-		[Range(0.0f, 72.0f)] public int FilesFontSize = 14;
+		// Font size used for the directory and file buttons
+		[Range(0.0f, 72.0f)] public int ItemFontSize = 14;
 		
 		// Font size used for the path, load and save text
-		[Range(0.0f, 72.0f)] public int UiFontSize = 14;
+		[Range(0.0f, 72.0f)] public int UserInterfaceFontSize = 14;
 
 		// ----- PRIVATE UI ELEMENTS ------
 
@@ -142,10 +136,10 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			if (uiCanvas != null) {
 				if (ViewMode == ViewMode.Portrait) {
 					GameObject fileBrowserUi = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UiFontSize, DirectoryButtonHeight, FilesButtonHeight);
+					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
 				} else {
 					GameObject fileBrowserUi = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UiFontSize, DirectoryButtonHeight, FilesButtonHeight);
+					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
 				}
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
@@ -168,8 +162,8 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Sets the font size for the directory and file texts
 		private void SetDirectoryAndFileFontSize() {
-			DirectoryButtonPrefab.GetComponent<Text>().fontSize = DirectoryFontSize;
-			FileButtonPrefab.GetComponent<Text>().fontSize = FilesFontSize;
+			DirectoryButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
+			FileButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
 		}
 
 		// Sets the current path (Android or other devices)

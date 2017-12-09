@@ -34,23 +34,18 @@ namespace SimpleFileBrowser.Scripts.GracesGames.UI {
 		private InputField _searchInputField;
 
 		// The default font size for labels such as current path, save file name etc.
-		private int _uiFontSize = 14;
+		private int _userInterfaceFontSize = 14;
 
-		// The height of the directoy buttons
-		protected int DirectoryButtonHeight = 70;
-
-		// The height of the files buttons
-		protected int FilesButtonHeight = 70;
+		// The height of the directoy and file buttons
+		protected int ItemButtonHeight = 70;
 
 		// Setup the file browser user interface (get values from file browser prefab)
-		public void Setup(FileBrowser fileBrowser, float uiWindowScale, int uiFontSize, int directoryButtonHeight,
-			int filesButtonHeight) {
+		public void Setup(FileBrowser fileBrowser, float uiWindowScale, int userInterfaceFontSize, int itemButtonHeight) {
 			_fileBrowser = fileBrowser;
 			name = "FileBrowserUI";
 			transform.localScale = new Vector3(uiWindowScale, uiWindowScale, 1f);
-			_uiFontSize = uiFontSize;
-			DirectoryButtonHeight = directoryButtonHeight;
-			FilesButtonHeight = filesButtonHeight;
+			_userInterfaceFontSize = userInterfaceFontSize;
+			ItemButtonHeight = itemButtonHeight;
 			SetupClickListeners();
 			SetupTextLabels();
 			SetupParents();
@@ -92,13 +87,13 @@ namespace SimpleFileBrowser.Scripts.GracesGames.UI {
 
 			// Set font size for labels and texts
 			if (pathLabel != null) {
-				pathLabel.GetComponent<Text>().fontSize = _uiFontSize;
+				pathLabel.GetComponent<Text>().fontSize = _userInterfaceFontSize;
 			}
-			fileLabel.GetComponent<Text>().fontSize = _uiFontSize;
-			_pathText.GetComponent<Text>().fontSize = _uiFontSize;
-			_loadFileText.GetComponent<Text>().fontSize = _uiFontSize;
+			fileLabel.GetComponent<Text>().fontSize = _userInterfaceFontSize;
+			_pathText.GetComponent<Text>().fontSize = _userInterfaceFontSize;
+			_loadFileText.GetComponent<Text>().fontSize = _userInterfaceFontSize;
 			foreach (Text textComponent in _saveFileText.GetComponentsInChildren<Text>()) {
-				textComponent.fontSize = _uiFontSize;
+				textComponent.fontSize = _userInterfaceFontSize;
 			}
 		}
 
@@ -111,7 +106,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames.UI {
 			// and hook up onValueChanged listener to update search results on value change
 			_searchInputField = FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
 			foreach (Text textComponent in _searchInputField.GetComponentsInChildren<Text>()) {
-				textComponent.fontSize = _uiFontSize;
+				textComponent.fontSize = _userInterfaceFontSize;
 			}
 			_searchInputField.onValueChanged.AddListener(_fileBrowser.UpdateSearchFilter);
 		}
