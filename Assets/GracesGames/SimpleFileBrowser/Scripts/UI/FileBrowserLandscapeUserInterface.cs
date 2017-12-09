@@ -1,12 +1,14 @@
-﻿namespace SimpleFileBrowser.Scripts.GracesGames.UI {
+﻿using GracesGames.Common.Scripts;
 
-    public class SetupLandscapeUserInterface : SetupUserInterface {
+namespace GracesGames.SimpleFileBrowser.Scripts.UI {
+
+    public class FileBrowserLandscapeUserInterface : FileBrowserUserInterface {
 
         protected override void SetupParents() {
             // Find directories parent to group directory buttons
-            DirectoriesParent = FindGameObjectOrError("Directories");
+            DirectoriesParent = Utilities.FindGameObjectOrError("Directories");
             // Find files parent to group file buttons
-            FilesParent = FindGameObjectOrError("Files");
+            FilesParent = Utilities.FindGameObjectOrError("Files");
             SetButtonParentHeight(DirectoriesParent, ItemButtonHeight);
             SetButtonParentHeight(FilesParent, ItemButtonHeight);
         }
