@@ -63,4 +63,9 @@ MonoBehaviour:
   LoadImage: {fileID: 21300000, guid: bcac61915feda41c2840db8963b97615, type: 3}
   ViewMode: 0
   HideIncompatibleFiles: 0
-  FileBrowserScale: 1
+  FileBrowserUiScale: 1
+  DirectoryButtonHeight: 120
+  DirectoryFontSize: 32
+  FilesButtonHeight: 120
+  FilesFontSize: 32
+  UiFontSize: 24

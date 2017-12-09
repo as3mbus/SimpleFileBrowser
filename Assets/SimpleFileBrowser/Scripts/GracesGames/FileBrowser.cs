@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.IO;
 using System.Linq;
 
+using SimpleFileBrowser.Scripts.GracesGames.UI;
 
 namespace SimpleFileBrowser.Scripts.GracesGames {
 
@@ -47,6 +48,21 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
+		
+		// Values used in the User Interface
+				
+		// Dimension used to set the scale of the UI
+		// Represented using a 0-1 slider in the editor
+		[Range(0.0f, 1.0f)] public float FileBrowserUiScale = 1f;
+
+		// Height of the directory and file buttons
+		[Range(0.0f, 200.0f)] public int ItemButtonHeight = 70;
+		
+		// Font size used for the directory and file buttons
+		[Range(0.0f, 72.0f)] public int ItemFontSize = 14;
+		
+		// Font size used for the path, load and save text
+		[Range(0.0f, 72.0f)] public int UserInterfaceFontSize = 14;
 
 		// ----- PRIVATE UI ELEMENTS ------
 
@@ -70,6 +86,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// Game object used as the parent for all the Files of the current path
 		private GameObject _filesParent;
 
+		// String used to filter files on name basis 
 		private string _searchFilter = "";
 
 		// ----- Private FILE BROWSER SETTINGS -----
@@ -115,21 +132,23 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			// Find the canvas so UI elements can be added to it
 			GameObject uiCanvas = GameObject.Find("Canvas");
 			// Instantiate the file browser UI using the transform of the canvas
-			// After creation, name it and scale it
+			// Then call the Setup method of the SetupUserInterface class to setup the User Interface using the set values
 			if (uiCanvas != null) {
 				if (ViewMode == ViewMode.Portrait) {
 					GameObject fileBrowserUi = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this);
+					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
 				} else {
 					GameObject fileBrowserUi = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this);
+					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
 				}
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
+			SetDirectoryAndFileFontSize();
 			SetupPath();
 		}
 
+		// Sets the user interface variables used by the file browser
 		public void SetUiGameObjects(GameObject selectFileButton, GameObject pathText, GameObject loadFileText,
 			GameObject saveFileText, InputField saveFileTextInputFile, GameObject directoriesParent, GameObject filesParent) {
 			_selectFileButton = selectFileButton;
@@ -141,6 +160,13 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			_filesParent = filesParent;
 		}
 
+		// Sets the font size for the directory and file texts
+		private void SetDirectoryAndFileFontSize() {
+			DirectoryButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
+			FileButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
+		}
+
+		// Sets the current path (Android or other devices)
 		private void SetupPath() {
 			if (IsAndroidPlatform()) {
 				SetupAndroidVariables();
