@@ -4,8 +4,8 @@ using UnityEngine.Events;
 
 namespace GracesGames.Common.Scripts {
 
-    // Utilities class defining re-usable methods
-	
+	// Utilities class defining re-usable methods
+
 	public class Utilities : MonoBehaviour {
 
 		// Finds and returns a game object by name or prints an error and return null
@@ -13,7 +13,6 @@ namespace GracesGames.Common.Scripts {
 			GameObject foundGameObject = GameObject.Find(objectName);
 			if (foundGameObject == null) {
 				Debug.LogError("Make sure " + objectName + " is present");
-				
 			}
 			return foundGameObject;
 		}

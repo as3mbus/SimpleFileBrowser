@@ -38,9 +38,9 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
-		
+
 		// ----- PRIVATE UI ELEMENTS ------
-		
+
 		// The user interface script for the Level Editor
 		private FileBrowserUserInterface _uiScript;
 

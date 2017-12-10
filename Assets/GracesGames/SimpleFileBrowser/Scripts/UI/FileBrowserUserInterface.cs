@@ -8,7 +8,7 @@ using System.IO;
 using GracesGames.Common.Scripts;
 
 namespace GracesGames.SimpleFileBrowser.Scripts.UI {
-	
+
 	// The UI used in the File Browser. 
 
 	public abstract class FileBrowserUserInterface : MonoBehaviour {
