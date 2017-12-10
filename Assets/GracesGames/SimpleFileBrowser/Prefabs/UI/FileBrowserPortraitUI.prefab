@@ -945,7 +945,10 @@ MonoBehaviour:
   LoadImage: {fileID: 21300000, guid: bcac61915feda41c2840db8963b97615, type: 3}
   ItemButtonHeight: 120
   ItemFontSize: 32
-  UserInterfaceFontSize: 24
+  PanelTextFontSize: 24
+  DirectoryPanelColor: {r: 0.25735295, g: 0.25735295, b: 0.25735295, a: 1}
+  FilePanelColor: {r: 0.5735294, g: 0.5735294, b: 0.5735294, a: 1}
+  ItemFontColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &114377232483168896
 MonoBehaviour:
   m_ObjectHideFlags: 1
