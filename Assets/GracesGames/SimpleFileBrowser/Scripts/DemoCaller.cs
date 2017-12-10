@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace SimpleFileBrowser.Scripts.GracesGames {
+namespace GracesGames.SimpleFileBrowser.Scripts {
 	// Demo class to illustrate the usage of the FileBrowser script
 	// Able to save and load files containing serialized data (e.g. text)
 	public class DemoCaller : MonoBehaviour {
@@ -48,15 +48,11 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Open the file browser using boolean parameter so it can be called in GUI
 		public void OpenFileBrowser(bool saving) {
-			if (saving) {
-				OpenFileBrowser(FileBrowserMode.Save);
-			} else {
-				OpenFileBrowser(FileBrowserMode.Load);
-			}
+			OpenFileBrowser(saving ? FileBrowserMode.Save : FileBrowserMode.Load);
 		}
 
 		// Open a file browser to save and load files
-		public void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
+		private void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
 			// Create the file browser and name it
 			GameObject fileBrowserObject = Instantiate(FileBrowserPrefab, transform);
 			fileBrowserObject.name = "FileBrowser";

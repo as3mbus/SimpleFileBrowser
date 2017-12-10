@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleFileBrowser.Scripts.GracesGames {
-	
+namespace GracesGames.Common.Scripts {
+
 	[Serializable]
 	public class FiniteStack<T> : LinkedList<T> {
 
@@ -18,9 +18,8 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			if (node != null) {
 				RemoveLast();
 				return node.Value;
-			} else {
-				return default(T);
 			}
+			return default(T);
 		}
 
 		public void Push(T value) {

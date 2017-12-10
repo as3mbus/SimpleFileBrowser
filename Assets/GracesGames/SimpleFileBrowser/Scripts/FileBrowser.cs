@@ -1,12 +1,13 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+
+using System;
 using System.IO;
 using System.Linq;
 
-using SimpleFileBrowser.Scripts.GracesGames.UI;
+using GracesGames.Common.Scripts;
+using GracesGames.SimpleFileBrowser.Scripts.UI;
 
-namespace SimpleFileBrowser.Scripts.GracesGames {
+namespace GracesGames.SimpleFileBrowser.Scripts {
 
 	// Enum used to define save and load mode
 	public enum FileBrowserMode {
@@ -14,6 +15,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		Load
 	}
 
+	// Enum used to define landscape or portrait view mode
 	public enum ViewMode {
 		Landscape,
 		Portrait
@@ -29,18 +31,6 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		// The File Browser UI Portrait mode as prefab
 		public GameObject FileBrowserPortraitUiPrefab;
 
-		// Button Prefab used to create a button for each directory in the current path
-		public GameObject DirectoryButtonPrefab;
-
-		// Button Prefab used to create a button for each file in the current path
-		public GameObject FileButtonPrefab;
-
-		// Sprite used to represent the save button
-		public Sprite SaveImage;
-
-		// Sprite used to represent the load button
-		public Sprite LoadImage;
-
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
 
 		// Whether directories and files should be displayed in one panel
@@ -48,43 +38,11 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Whether files with incompatible extensions should be hidden
 		public bool HideIncompatibleFiles;
-		
-		// Values used in the User Interface
-				
-		// Dimension used to set the scale of the UI
-		// Represented using a 0-1 slider in the editor
-		[Range(0.0f, 1.0f)] public float FileBrowserUiScale = 1f;
-
-		// Height of the directory and file buttons
-		[Range(0.0f, 200.0f)] public int ItemButtonHeight = 70;
-		
-		// Font size used for the directory and file buttons
-		[Range(0.0f, 72.0f)] public int ItemFontSize = 14;
-		
-		// Font size used for the path, load and save text
-		[Range(0.0f, 72.0f)] public int UserInterfaceFontSize = 14;
 
 		// ----- PRIVATE UI ELEMENTS ------
 
-		// Button used to select a file to save/load
-		private GameObject _selectFileButton;
-
-		// Game object that represents the current path
-		private GameObject _pathText;
-
-		// Game object  and  InputField that represents the name of the file to save
-		private GameObject _saveFileText;
-
-		private InputField _saveFileTextInputFile;
-
-		// Game object (Text) that represents the name of the file to load
-		private GameObject _loadFileText;
-
-		// Game object used as the parent for all the Directories of the current path
-		private GameObject _directoriesParent;
-
-		// Game object used as the parent for all the Files of the current path
-		private GameObject _filesParent;
+		// The user interface script for the Level Editor
+		private FileBrowserUserInterface _uiScript;
 
 		// String used to filter files on name basis 
 		private string _searchFilter = "";
@@ -134,36 +92,15 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			// Instantiate the file browser UI using the transform of the canvas
 			// Then call the Setup method of the SetupUserInterface class to setup the User Interface using the set values
 			if (uiCanvas != null) {
-				if (ViewMode == ViewMode.Portrait) {
-					GameObject fileBrowserUi = Instantiate(FileBrowserPortraitUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
-				} else {
-					GameObject fileBrowserUi = Instantiate(FileBrowserLandscapeUiPrefab, uiCanvas.transform, false);
-					fileBrowserUi.GetComponent<SetupUserInterface>().Setup(this, FileBrowserUiScale, UserInterfaceFontSize, ItemButtonHeight);
-				}
+				GameObject userIterfacePrefab =
+					ViewMode == ViewMode.Portrait ? FileBrowserPortraitUiPrefab : FileBrowserLandscapeUiPrefab;
+				GameObject fileBrowserUi = Instantiate(userIterfacePrefab, uiCanvas.transform, false);
+				_uiScript = fileBrowserUi.GetComponent<FileBrowserUserInterface>();
+				_uiScript.Setup(this);
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
-			SetDirectoryAndFileFontSize();
 			SetupPath();
-		}
-
-		// Sets the user interface variables used by the file browser
-		public void SetUiGameObjects(GameObject selectFileButton, GameObject pathText, GameObject loadFileText,
-			GameObject saveFileText, InputField saveFileTextInputFile, GameObject directoriesParent, GameObject filesParent) {
-			_selectFileButton = selectFileButton;
-			_pathText = pathText;
-			_loadFileText = loadFileText;
-			_saveFileText = saveFileText;
-			_saveFileTextInputFile = saveFileTextInputFile;
-			_directoriesParent = directoriesParent;
-			_filesParent = filesParent;
-		}
-
-		// Sets the font size for the directory and file texts
-		private void SetDirectoryAndFileFontSize() {
-			DirectoryButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
-			FileButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
 		}
 
 		// Sets the current path (Android or other devices)
@@ -197,6 +134,11 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				}
 			}
 			return path;
+		}
+
+		// Returns the current mode (save or load)
+		public FileBrowserMode GetMode() {
+			return _mode;
 		}
 
 		// Returns to the previously selected directory (inverse of DirectoryForward)
@@ -262,7 +204,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		public void SelectFile() {
 			// When saving, send the path and new file name, else the selected file
 			if (_mode == FileBrowserMode.Save) {
-				string inputFieldValue = _saveFileTextInputFile.text;
+				string inputFieldValue = _uiScript.GetSaveFileText();
 				// Additional check for invalid input field value
 				// Should never be true due to onValueChanged check with toggle on save button
 				if (String.IsNullOrEmpty(inputFieldValue)) {
@@ -284,7 +226,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 
 		// Checks the current value of the InputField. If it is an empty string, disable the save button
 		public void CheckValidFileName(string inputFieldValue) {
-			_selectFileButton.SetActive(inputFieldValue != "");
+			_uiScript.ToggleSelectFileButton(inputFieldValue != "");
 		}
 
 		// Updates the search filter and filters the UI
@@ -297,40 +239,19 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 		private void UpdateFileBrowser(bool topLevel = false) {
 			UpdatePathText();
 			UpdateLoadFileText();
-			ResetParents();
+			_uiScript.ResetParents();
 			BuildDirectories(topLevel);
 			BuildFiles();
 		}
 
 		// Updates the path text
 		private void UpdatePathText() {
-			if (_pathText != null && _pathText.GetComponent<Text>() != null) {
-				_pathText.GetComponent<Text>().text = _currentPath;
-			}
+			_uiScript.UpdatePathText(_currentPath);
 		}
 
 		// Updates the file to load text
 		private void UpdateLoadFileText() {
-			if (_loadFileText != null && _loadFileText.GetComponent<Text>() != null) {
-				_loadFileText.GetComponent<Text>().text = _currentFile;
-			}
-		}
-
-		// Resets the directories and files parent game objects
-		private void ResetParents() {
-			// Remove all current game objects under the directories parent
-			ResetParent(_directoriesParent);
-			// Remove all current game objects under the files parent
-			ResetParent(_filesParent);
-		}
-
-		// Removes all current game objects under the parent game object
-		private void ResetParent(GameObject parent) {
-			if (parent.transform.childCount > 0) {
-				foreach (Transform child in parent.transform) {
-					GameObject.Destroy(child.gameObject);
-				}
-			}
+			_uiScript.UpdateLoadFileText(_currentFile);
 		}
 
 		// Creates a DirectoryButton for each directory in the current path
@@ -350,7 +271,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			}
 			// For each directory in the current directory, create a DirectoryButton and hook up the DirectoryClick method
 			foreach (string dir in directories) {
-				CreateDirectoryButton(dir);
+				_uiScript.CreateDirectoryButton(dir);
 			}
 		}
 
@@ -370,17 +291,6 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 			        Application.platform == RuntimePlatform.OSXPlayer);
 		}
 
-		// Creates a directory button given a directory
-		private void CreateDirectoryButton(string directory) {
-			GameObject button = Instantiate(DirectoryButtonPrefab, Vector3.zero, Quaternion.identity);
-			button.GetComponent<Text>().text = new DirectoryInfo(directory).Name;
-			button.transform.SetParent(_directoriesParent.transform, false);
-			button.transform.localScale = Vector3.one;
-			button.GetComponent<Button>().onClick.AddListener(() => {
-				DirectoryClick(directory);
-			});
-		}
-
 		// Creates a FileButton for each file in the current path
 		private void BuildFiles() {
 			// Get the files
@@ -395,12 +305,11 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				// Hide files (no button) with incompatible file extensions when enabled
 				if (HideIncompatibleFiles) {
 					if (CompatibleFileExtension(file)) {
-						CreateFileButton(file);
+						_uiScript.CreateFileButton(file);
 					}
 				} else {
-					CreateFileButton(file);
+					_uiScript.CreateFileButton(file);
 				}
-
 			}
 		}
 
@@ -412,57 +321,30 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				 Path.GetFileName(file).IndexOf(_searchFilter, StringComparison.OrdinalIgnoreCase) >= 0)).ToArray();
 		}
 
-		// Creates a file button given a file
-		private void CreateFileButton(string file) {
-			GameObject button = Instantiate(FileButtonPrefab, Vector3.zero, Quaternion.identity);
-			// When in Load mode, disable the buttons with different extension than the given file extension
-			if (_mode == FileBrowserMode.Load) {
-				DisableWrongExtensionFiles(button, file);
-			}
-			button.GetComponent<Text>().text = Path.GetFileName(file);
-			button.transform.SetParent(_filesParent.transform, false);
-			button.transform.localScale = Vector3.one;
-			button.GetComponent<Button>().onClick.AddListener(() => {
-				FileClick(file);
-			});
-		}
-
-		// Disables file buttons with files that have a different file extension (than given to the OpenFilePanel)
-		private void DisableWrongExtensionFiles(GameObject button, string file) {
-			if (!CompatibleFileExtension(file)) {
-				button.GetComponent<Button>().interactable = false;
-			}
-		}
-
 		// Returns whether the file given is compatible (correct file extension)
-		private bool CompatibleFileExtension(string file) {
+		public bool CompatibleFileExtension(string file) {
 			return file.EndsWith("." + _fileExtension);
 		}
 
 		// When a directory is clicked, update the path and the file browser
-		private void DirectoryClick(string path) {
+		public void DirectoryClick(string path) {
 			_backwardStack.Push(_currentPath.Clone() as string);
 			_currentPath = path;
 			UpdateFileBrowser();
 		}
 
 		// When a file is click, validate and update the save file text or current file and update the file browser
-		private void FileClick(string clickedFile) {
+		public void FileClick(string clickedFile) {
 			// When in save mode, update the save name to the clicked file name
 			// Else update the current file text
 			if (_mode == FileBrowserMode.Save) {
 				string clickedFileName = Path.GetFileNameWithoutExtension(clickedFile);
 				CheckValidFileName(clickedFileName);
-				SetFileNameInputField(clickedFileName, _fileExtension);
+				_uiScript.SetFileNameInputField(clickedFileName, _fileExtension);
 			} else {
 				_currentFile = clickedFile;
 			}
 			UpdateFileBrowser();
-		}
-
-		// Updates the input field value with a file name and extension
-		private void SetFileNameInputField(string fileName, string fileExtension) {
-			_saveFileTextInputFile.text = fileName + "." + fileExtension;
 		}
 
 		// Opens a file browser in save mode
@@ -475,11 +357,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				fileExtension = "";
 			}
 			_mode = FileBrowserMode.Save;
-			_saveFileText.SetActive(true);
-			_loadFileText.SetActive(false);
-			_selectFileButton.GetComponent<Image>().sprite = SaveImage;
-			// Update the input field with the default name and file extension
-			SetFileNameInputField(defaultName, fileExtension);
+			_uiScript.SetSaveMode(defaultName, fileExtension);
 			FilePanel(callerScript, callbackMethod, fileExtension);
 		}
 
@@ -492,9 +370,7 @@ namespace SimpleFileBrowser.Scripts.GracesGames {
 				fileExtension = "*";
 			}
 			_mode = FileBrowserMode.Load;
-			_loadFileText.SetActive(true);
-			_selectFileButton.GetComponent<Image>().sprite = LoadImage;
-			_saveFileText.SetActive(false);
+			_uiScript.SetLoadMode();
 			FilePanel(callerScript, callbackMethod, fileExtension);
 		}
 
