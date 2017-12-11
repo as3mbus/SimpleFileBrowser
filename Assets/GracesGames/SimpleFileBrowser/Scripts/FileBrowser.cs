@@ -42,7 +42,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		// ----- PRIVATE UI ELEMENTS ------
 
 		// The user interface script for the Level Editor
-		private FileBrowserUserInterface _uiScript;
+		private UserInterface _uiScript;
 
 		// String used to filter files on name basis 
 		private string _searchFilter = "";
@@ -95,7 +95,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 				GameObject userIterfacePrefab =
 					ViewMode == ViewMode.Portrait ? FileBrowserPortraitUiPrefab : FileBrowserLandscapeUiPrefab;
 				GameObject fileBrowserUi = Instantiate(userIterfacePrefab, uiCanvas.transform, false);
-				_uiScript = fileBrowserUi.GetComponent<FileBrowserUserInterface>();
+				_uiScript = fileBrowserUi.GetComponent<UserInterface>();
 				_uiScript.Setup(this);
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");

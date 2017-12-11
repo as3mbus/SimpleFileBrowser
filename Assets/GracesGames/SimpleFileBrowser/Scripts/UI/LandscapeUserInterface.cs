@@ -4,7 +4,7 @@ using GracesGames.Common.Scripts;
 
 namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 
-    public class FileBrowserLandscapeUserInterface : FileBrowserUserInterface {
+    public class LandscapeUserInterface : UserInterface {
 
         protected override void SetupParents() {
             // Find directories parent to group directory buttons
