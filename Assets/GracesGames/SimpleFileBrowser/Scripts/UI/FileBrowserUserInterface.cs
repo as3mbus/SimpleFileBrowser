@@ -29,13 +29,22 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 		public Sprite LoadImage;
 
 		// Height of the directory and file buttons
-		[Range(0.0f, 200.0f)] public int ItemButtonHeight = 70;
+		[Range(0.0f, 200.0f)] public int ItemButtonHeight = 120;
 
 		// Font size used for the directory and file buttons
-		[Range(0.0f, 72.0f)] public int ItemFontSize = 14;
+		[Range(0.0f, 72.0f)] public int ItemFontSize = 32;
 
 		// Font size used for the path, load and save text
-		[Range(0.0f, 72.0f)] public int UserInterfaceFontSize = 14;
+		[Range(0.0f, 72.0f)] public int PanelTextFontSize = 24;
+		
+		// Color used for the Directory Panel (and ItemPanel for Portrait mode)
+		public Color DirectoryPanelColor = Color.gray;
+
+		// Color used for the File Panel
+		public Color FilePanelColor = Color.gray;
+
+		// Color used for the directory and file texts
+		public Color ItemFontColor = Color.white;
 
 		// The file browser using this user interface
 		private FileBrowser _fileBrowser;
@@ -68,17 +77,19 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			_fileBrowser = fileBrowser;
 			name = "FileBrowserUI";
 			transform.localScale = new Vector3(UserInterfaceScale, UserInterfaceScale, 1f);
-			SetDirectoryAndFileFontSize();
+			SetupDirectoryAndFilePrefab();
 			SetupClickListeners();
 			SetupTextLabels();
 			SetupParents();
 			SetupSearchInputField();
 		}
 
-		// Sets the font size for the directory and file texts
-		private void SetDirectoryAndFileFontSize() {
+		// Sets the font size and color for the directory and file texts
+		private void SetupDirectoryAndFilePrefab() {
 			DirectoryButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
 			FileButtonPrefab.GetComponent<Text>().fontSize = ItemFontSize;
+			DirectoryButtonPrefab.GetComponent<Text>().color = ItemFontColor;
+			FileButtonPrefab.GetComponent<Text>().color = ItemFontColor;
 		}
 
 		// Setup click listeners for buttons
@@ -113,13 +124,13 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 
 			// Set font size for labels and texts
 			if (pathLabel != null) {
-				pathLabel.GetComponent<Text>().fontSize = UserInterfaceFontSize;
+				pathLabel.GetComponent<Text>().fontSize = PanelTextFontSize;
 			}
-			fileLabel.GetComponent<Text>().fontSize = UserInterfaceFontSize;
-			_pathText.GetComponent<Text>().fontSize = UserInterfaceFontSize;
-			_loadFileText.GetComponent<Text>().fontSize = UserInterfaceFontSize;
+			fileLabel.GetComponent<Text>().fontSize = PanelTextFontSize;
+			_pathText.GetComponent<Text>().fontSize = PanelTextFontSize;
+			_loadFileText.GetComponent<Text>().fontSize = PanelTextFontSize;
 			foreach (Text textComponent in _saveFileText.GetComponentsInChildren<Text>()) {
-				textComponent.fontSize = UserInterfaceFontSize;
+				textComponent.fontSize = PanelTextFontSize;
 			}
 		}
 
@@ -132,7 +143,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			// and hook up onValueChanged listener to update search results on value change
 			_searchInputField = Utilities.FindGameObjectOrError("SearchInputField").GetComponent<InputField>();
 			foreach (Text textComponent in _searchInputField.GetComponentsInChildren<Text>()) {
-				textComponent.fontSize = UserInterfaceFontSize;
+				textComponent.fontSize = PanelTextFontSize;
 			}
 			_searchInputField.onValueChanged.AddListener(_fileBrowser.UpdateSearchFilter);
 		}
