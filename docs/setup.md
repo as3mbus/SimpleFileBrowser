@@ -17,7 +17,7 @@ These paths are then passed on to a caller script which can use them to, for exa
 
 ***
 
-**Screen orientation**
+**Screen Orientation**
 
 After instantiating the FileBrowser prefab, get the script using 
 
@@ -35,7 +35,7 @@ Example given in the DemoCaller script.
 
 ***
 
-**How to create a FileBrowser dialog:**
+**How to Create a FileBrowser Dialog:**
 
 ```csharp
 // Open a file browser to save and load files
@@ -54,9 +54,9 @@ public void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
 ```
 ***
 
-**UI options**
+**UI Options**
 
-The UI has a view options for scaling and coloring panels, buttons and fonts. 
+The UI has a few options for scaling and coloring panels, buttons and fonts. 
 
 These are self-explanatory and can be setup easily by the public variables in the UI prefabs.
 
