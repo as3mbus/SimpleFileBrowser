@@ -55,5 +55,5 @@ MonoBehaviour:
     type: 2}
   FileBrowserPortraitUiPrefab: {fileID: 1110909879947270, guid: 48dff708ae8de40df9d0a86ffd6df8f0,
     type: 2}
-  ViewMode: 0
+  ViewMode: 1
   HideIncompatibleFiles: 0
