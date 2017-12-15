@@ -18,4 +18,4 @@ The Simple File Browser allows users to save and load files without any dependen
 - Support for multiple drives 
 - Tested on Windows, Mac, Linux and Android
 
-For a content description, setup instructions, more please see the [wiki](https://github.com/GracesGames/SimpleFileBrowser/wiki)
+For a content description, setup instructions and more please see the [website](https://gracesgames.github.io/SimpleFileBrowser/)
