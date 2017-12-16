@@ -6,8 +6,8 @@ This package allows the user to browse the file system in the Unity Editor and t
 
 The Simple File Browser allows users to save and load files without any dependencies e.g. the UnityEditor namespace.
 
-![SaveExample](https://github.com/GracesGames/SimpleFileBrowser/blob/master/Images/Save.png)
 ![LoadExample](https://github.com/GracesGames/SimpleFileBrowser/blob/master/Images/Load.png)
+![SaveExample](https://github.com/GracesGames/SimpleFileBrowser/blob/master/Images/Save.png)
 
 ## Features:
 
