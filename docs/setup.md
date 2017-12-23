@@ -39,12 +39,13 @@ Example given in the DemoCaller script.
 
 ```csharp
 // Open a file browser to save and load files
-public void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
+private void OpenFileBrowser(FileBrowserMode fileBrowserMode) {
     // Create the file browser and name it
-    GameObject fileBrowserObject = Instantiate(FileBrowserPrefab, this.transform);
+    GameObject fileBrowserObject = Instantiate(FileBrowserPrefab, transform);
     fileBrowserObject.name = "FileBrowser";
     // Set the mode to save or load
     FileBrowser fileBrowserScript = fileBrowserObject.GetComponent<FileBrowser>();
+    fileBrowserScript.SetupFileBrowser(PortraitMode ? ViewMode.Portrait : ViewMode.Landscape);
     if (fileBrowserMode == FileBrowserMode.Save) {
         fileBrowserScript.SaveFilePanel(this, "SaveFileUsingPath", "DemoText", FileExtension);
     } else {
