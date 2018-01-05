@@ -271,7 +271,9 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			}
 			// For each directory in the current directory, create a DirectoryButton and hook up the DirectoryClick method
 			foreach (string dir in directories) {
-				_uiScript.CreateDirectoryButton(dir);
+				if (Directory.Exists(dir)){
+					_uiScript.CreateDirectoryButton(dir);
+				}
 			}
 		}
 
