@@ -100,6 +100,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			} else {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
+
 			SetupPath();
 		}
 
@@ -133,6 +134,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 					path = Directory.GetCurrentDirectory();
 				}
 			}
+
 			return path;
 		}
 
@@ -148,6 +150,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 				// If so, push it to the forward stack
 				_forwardStack.Push(_currentPath);
 			}
+
 			// Get the last path entry
 			string backPath = _backwardStack.Pop();
 			if (backPath != null) {
@@ -164,6 +167,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 				// If so, push it to the backward stack
 				_backwardStack.Push(_currentPath);
 			}
+
 			// Get the last level entry
 			string forwardPath = _forwardStack.Pop();
 			if (forwardPath != null) {
@@ -190,8 +194,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			if (IsAndroidPlatform()) {
 				return Directory.GetParent(_currentPath).FullName == Directory.GetParent(_rootAndroidPath).FullName;
 			}
-			return Directory.GetParent(_currentPath) == null;
 
+			return Directory.GetParent(_currentPath) == null;
 		}
 
 		// Closes the file browser and send back an empty string
@@ -269,9 +273,10 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 					directories = Directory.GetDirectories(_currentPath);
 				}
 			}
+
 			// For each directory in the current directory, create a DirectoryButton and hook up the DirectoryClick method
 			foreach (string dir in directories) {
-				if (Directory.Exists(dir)){
+				if (Directory.Exists(dir)) {
 					_uiScript.CreateDirectoryButton(dir);
 				}
 			}
@@ -304,11 +309,10 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 			// For each file in the current directory, create a FileButton and hook up the FileClick method
 			foreach (string file in files) {
+				if (!File.Exists(file)) return;
 				// Hide files (no button) with incompatible file extensions when enabled
-				if (HideIncompatibleFiles) {
-					if (CompatibleFileExtension(file)) {
-						_uiScript.CreateFileButton(file);
-					}
+				if (HideIncompatibleFiles && CompatibleFileExtension(file)) {
+					_uiScript.CreateFileButton(file);
 				} else {
 					_uiScript.CreateFileButton(file);
 				}
@@ -346,6 +350,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			} else {
 				_currentFile = clickedFile;
 			}
+
 			UpdateFileBrowser();
 		}
 
@@ -358,6 +363,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			if (fileExtension == null) {
 				fileExtension = "";
 			}
+
 			_mode = FileBrowserMode.Save;
 			_uiScript.SetSaveMode(defaultName, fileExtension);
 			FilePanel(callerScript, callbackMethod, fileExtension);
@@ -371,6 +377,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 			if (String.IsNullOrEmpty(fileExtension)) {
 				fileExtension = "*";
 			}
+
 			_mode = FileBrowserMode.Load;
 			_uiScript.SetLoadMode();
 			FilePanel(callerScript, callbackMethod, fileExtension);

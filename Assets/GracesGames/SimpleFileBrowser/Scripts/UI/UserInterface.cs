@@ -36,7 +36,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 
 		// Font size used for the path, load and save text
 		[Range(0.0f, 72.0f)] public int PanelTextFontSize = 24;
-		
+
 		// Color used for the Directory Panel (and ItemPanel for Portrait mode)
 		public Color DirectoryPanelColor = Color.gray;
 
@@ -126,6 +126,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			if (pathLabel != null) {
 				pathLabel.GetComponent<Text>().fontSize = PanelTextFontSize;
 			}
+
 			fileLabel.GetComponent<Text>().fontSize = PanelTextFontSize;
 			_pathText.GetComponent<Text>().fontSize = PanelTextFontSize;
 			_loadFileText.GetComponent<Text>().fontSize = PanelTextFontSize;
@@ -145,6 +146,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			foreach (Text textComponent in _searchInputField.GetComponentsInChildren<Text>()) {
 				textComponent.fontSize = PanelTextFontSize;
 			}
+
 			_searchInputField.onValueChanged.AddListener(_fileBrowser.UpdateSearchFilter);
 		}
 
@@ -225,6 +227,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts.UI {
 			if (_fileBrowser.GetMode() == FileBrowserMode.Load) {
 				DisableWrongExtensionFiles(button, file);
 			}
+
 			SetupButton(button, Path.GetFileName(file), FilesParent.transform, () => { _fileBrowser.FileClick(file); });
 		}
 
