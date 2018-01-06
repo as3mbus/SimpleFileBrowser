@@ -83,7 +83,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		// ----- METHODS -----
 
 		// Method used to setup the file browser
-		public void SetupFileBrowser(ViewMode newViewMode) {
+		// Requires a view mode to setup the UI and allows a starting path
+		public void SetupFileBrowser(ViewMode newViewMode, string startPath = "") {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
 
@@ -101,12 +102,16 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
 			}
 
-			SetupPath();
+			SetupPath(startPath);
 		}
 
 		// Sets the current path (Android or other devices)
-		private void SetupPath() {
-			if (IsAndroidPlatform()) {
+		// If the given start path is valid, set the current path to start path
+		private void SetupPath(string startPath) {
+			if (!String.IsNullOrEmpty(startPath) && Directory.Exists(startPath)) {
+				_currentPath = startPath;
+			}
+			else if (IsAndroidPlatform()) {
 				SetupAndroidVariables();
 				_currentPath = _rootAndroidPath;
 			} else {
