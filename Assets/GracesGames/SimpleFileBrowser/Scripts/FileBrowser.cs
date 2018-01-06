@@ -25,10 +25,10 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// ----- PUBLIC UI ELEMENTS -----
 
-		// The File Browser UI Landscape mode as prefab
+		// The file browser UI Landscape mode as prefab
 		public GameObject FileBrowserLandscapeUiPrefab;
 
-		// The File Browser UI Portrait mode as prefab
+		// The file browser UI Portrait mode as prefab
 		public GameObject FileBrowserPortraitUiPrefab;
 
 		// ----- PUBLIC FILE BROWSER SETTINGS -----
@@ -41,7 +41,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// ----- PRIVATE UI ELEMENTS ------
 
-		// The user interface script for the Level Editor
+		// The user interface script for the file browser
 		private UserInterface _uiScript;
 
 		// String used to filter files on name basis 
@@ -82,7 +82,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 		// ----- METHODS -----
 
-		// Method used to setup the FileBrowser
+		// Method used to setup the file browser
 		public void SetupFileBrowser(ViewMode newViewMode) {
 			// Set the view mode (landscape or portrait)
 			ViewMode = newViewMode;
@@ -222,7 +222,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 		}
 
 		// Sends back a message to the callerScript and callbackMethod
-		// Then destroys the FileBrowser
+		// Then destroys the file browser
 		private void SendCallbackMessage(string message) {
 			_callerScript.SendMessage(_callbackMethod, message);
 			Destroy();
